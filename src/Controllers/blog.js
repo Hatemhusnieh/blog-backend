@@ -17,6 +17,12 @@ class Interface {
   }
 
   update(_id, obj) {
+    if(obj.comment){
+      const addComment = this.model.findOne(_id);
+      addComment.comments.push(obj);
+      addComment.save();
+      return;
+    }
     return this.model.findByIdAndUpdate(_id, obj, { new: true });
   }
 
