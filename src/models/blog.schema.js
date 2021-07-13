@@ -2,15 +2,19 @@
 const mongoose = require('mongoose');
 
 const blogSchema = mongoose.Schema({
-  blogger : {
+  blogger: {
     type: String,
-    required : true,
+    required: true,
   },
   content: {
     type: String,
-    required : true,
+    required: true,
   },
-  date : new Date().toLocaleDateString(),
+  date: {
+    type: String,
+    required: true,
+  },
+  comments: [],
 });
 
 const blogModel = mongoose.model('blogs', blogSchema);

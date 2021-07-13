@@ -15,20 +15,32 @@ app.use(express.json());
 
 io.on('connection', socket => {
 
+  socket.on('join', () => {
+    socket.join('feeds');
+  });
+
   socket.on('read', async () => {
     const data = await blog.read({});
-    socket.emit('blogs', data);
+    socket.in('feeds').emit('blogs', data);
   });
 
   socket.on('write', async payload => {
-    await blog.create(payload);
+    const newBlog = await blog.create(payload);
     const data = await blog.read({});
-    socket.emit('blogs', data);
+    socket.to('feeds').emit('newBlog', { blogger: newBlog.blogger });
+    socket.in('feeds').emit('blogs', data);
+  });
+
+  socket.on('comments', async payload => {
+    const updatedBlog = await blog.update(payload);
+    const data = await blog.read({});
+    socket.in('feeds').emit('blogs', data);
+    socket.to('feeds').emit('newComment', { blogger: updatedBlog.blogger });
   });
 
 });
 
-// prof of life
+// proof of life
 app.get('/', (req, res) => {
   res.status(200).send('<p>“A day may come when the courage of men fails, when we forsake our friends and break all bonds of fellowship, but it is not this day. Aragorn, The Lord of the Rings: Return of the King” </p>');
 });
