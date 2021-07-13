@@ -20,22 +20,22 @@ io.on('connection', socket => {
   });
 
   socket.on('read', async () => {
-    const data = await blog.read({});
-    socket.in('feeds').emit('blogs', data);
+    const data = await blog.read();
+    io.in('feeds').emit('blogs', data);
   });
 
   socket.on('write', async payload => {
     const newBlog = await blog.create(payload);
-    const data = await blog.read({});
-    socket.to('feeds').emit('newBlog', { blogger: newBlog.blogger });
-    socket.in('feeds').emit('blogs', data);
+    const data = await blog.read();
+    io.to('feeds').emit('newBlog', { blogger: newBlog.blogger });
+    io.in('feeds').emit('blogs', data);
   });
 
   socket.on('comments', async payload => {
     const updatedBlog = await blog.update(payload);
-    const data = await blog.read({});
-    socket.in('feeds').emit('blogs', data);
-    socket.to('feeds').emit('newComment', { blogger: updatedBlog.blogger });
+    const data = await blog.read();
+    io.in('feeds').emit('blogs', data);
+    io.to('feeds').emit('newComment', { blogger: updatedBlog.blogger });
   });
 
 });
@@ -48,6 +48,6 @@ app.get('/', (req, res) => {
 module.exports = {
   app,
   start: port => {
-    app.listen(port, () => console.log(`server is up at ${port}`));
+    server.listen(port, () => console.log(`server is up at ${port}`));
   },
 };
