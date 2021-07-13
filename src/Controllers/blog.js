@@ -11,8 +11,9 @@ class Interface {
     return this.model.find({});
   }
 
-  cerate(obg) {
-    const blog = new this.model(obg);
+  create(obj) {
+    obj.date = new Date().toLocaleDateString();
+    const blog = new this.model(obj);
     return blog.save();
   }
 
