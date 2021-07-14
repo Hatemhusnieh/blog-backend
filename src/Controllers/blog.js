@@ -17,7 +17,7 @@ class Interface {
     return blog.save();
   }
 
-  update(_id, obj) {
+  update=async (_id, obj)=> {
     if (obj.comment) {
       const addComment = this.model.findOne(_id);
       addComment.comments.push(obj);
@@ -27,11 +27,12 @@ class Interface {
     return this.model.findByIdAndUpdate(_id, obj, { new: true });
   }
 
-  delete(payload) {
-    const valid = this.model.findOne(payload.id);
-    if (valid.blogger == payload.blogger && valid.password == payload.pass) {
-      this.model.findByIdAndDelete(payload.id);
-      return;
+  delete = async (payload) =>{
+    // console.log(payload);
+    const valid = await this.model.findOne({_id:payload.id});
+    if (valid.blogger == payload.blogger && valid.password == payload.password) {
+     const deleted=  this.model.findByIdAndDelete({_id:payload.id});
+     return deleted;
     }
     return 'invalid username or password';
   }

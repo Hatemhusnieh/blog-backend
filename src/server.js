@@ -27,6 +27,7 @@ io.on('connection', socket => {
 
   socket.on('write', async payload => {
     const newBlog = await blog.create(payload);
+   
     const data = await blog.read();
     socket.to('feeds').emit('newBlog', newBlog.blogger);
     io.in('feeds').emit('blogs', data);
@@ -40,9 +41,16 @@ io.on('connection', socket => {
   // });
 
   socket.on('delete', async payload => {
-    await blog.delete(payload);
-    const data = await blog.read();
-    socket.emit('blogs', data);
+    console.log(payload);
+    const errorMessage = await blog.delete(payload);
+    console.log(typeof(errorMessage));
+    if(typeof(errorMessage)!="string"){
+      const data = await blog.read();
+      io.in('feeds').emit('blogs', data);
+    }else{
+      // console.log('in else')
+      io.to(socket.id).emit('error',errorMessage);
+    }
   });
 });
 // proof of life
