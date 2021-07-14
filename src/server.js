@@ -29,7 +29,7 @@ io.on('connection', socket => {
     const newBlog = await blog.create(payload);
     const data = await blog.read();
     socket.to('feeds').emit('newBlog', newBlog.blogger);
-    socket.in('feeds').emit('blogs', data);
+    io.in('feeds').emit('blogs', data);
   });
 
   // socket.on('comments', async payload => {
