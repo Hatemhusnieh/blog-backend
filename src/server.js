@@ -8,43 +8,47 @@ const model = require('./models/blog.schema');
 const Interface = require('./Controllers/blog');
 const blog = new Interface(model);
 const io = require('socket.io')(http);
-
 io.listen(server);
 app.use(cors());
 app.use(express.json());
 
 io.on('connection', socket => {
 
-  socket.on('join', () => {
+  socket.on('join', (payload) => {
     socket.join('feeds');
+    console.log(`room was entered by ${socket.id} by: ${payload.name} with ${payload.password}`);
   });
 
   socket.on('read', async () => {
     const data = await blog.read();
-    io.in('feeds').emit('blogs', data);
+    // console.log(data);
+    socket.emit('blogs', data);
   });
 
   socket.on('write', async payload => {
     const newBlog = await blog.create(payload);
     const data = await blog.read();
-    io.to('feeds').emit('newBlog', { blogger: newBlog.blogger });
-    io.in('feeds').emit('blogs', data);
+    socket.to('feeds').emit('newBlog', newBlog.blogger);
+    socket.in('feeds').emit('blogs', data);
   });
 
-  socket.on('comments', async payload => {
-    const updatedBlog = await blog.update(payload);
+  // socket.on('comments', async payload => {
+  //   const updatedBlog = await blog.update(payload);
+  //   const data = await blog.read();
+  //   socket.in('feeds').emit('blogs', data);
+  //   socket.to('feeds').emit('newComment', { blogger: updatedBlog.blogger });
+  // });
+
+  socket.on('delete', async payload => {
+    await blog.delete(payload);
     const data = await blog.read();
-    io.in('feeds').emit('blogs', data);
-    io.to('feeds').emit('newComment', { blogger: updatedBlog.blogger });
+    socket.emit('blogs', data);
   });
-
 });
-
 // proof of life
 app.get('/', (req, res) => {
-  res.status(200).send('<p>“A day may come when the courage of men fails, when we forsake our friends and break all bonds of fellowship, but it is not this day. Aragorn, The Lord of the Rings: Return of the King” </p>');
+  res.status(200).send('<p>"A day may come when the courage of men fails, when we forsake our friends and break all bonds of fellowship, but it is not this day. Aragorn, The Lord of the Rings: Return of the King" </p>');
 });
-
 module.exports = {
   app,
   start: port => {
