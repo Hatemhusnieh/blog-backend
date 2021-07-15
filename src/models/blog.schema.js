@@ -5,6 +5,7 @@ const blogSchema = mongoose.Schema({
   blogger: {
     type: String,
     required: true,
+    // unique:true,
   },
   content: {
     type: String,
@@ -19,6 +20,7 @@ const blogSchema = mongoose.Schema({
     required: true,
   },
   comments: [],
+  likes:[],
 });
 
 const blogModel = mongoose.model('blogs', blogSchema);
