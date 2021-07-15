@@ -12,27 +12,39 @@ class Interface {
   }
 
   create(obj) {
-    obj.date = new Date().toLocaleDateString();
+    obj.date = new Date().toLocaleTimeString();
     const blog = new this.model(obj);
     return blog.save();
   }
 
-  update=async (_id, obj)=> {
-    if (obj.comment) {
-      const addComment = this.model.findOne(_id);
-      addComment.comments.push(obj);
-      addComment.save();
-      return;
-    }
-    return this.model.findByIdAndUpdate(_id, obj, { new: true });
+  // async update(_id, obj) {
+  //   if (obj.comment) {
+  //     const addComment = this.model.findOne(_id);
+  //     addComment.comments.push(obj);
+  //     addComment.save();
+  //     return;
+  //   }
+  //   return this.model.findByIdAndUpdate(_id, obj, { new: true });
+  // }
+
+  async comment(payload) {
+    const id = payload.id;
+    const comment = {
+      comment : payload.comment,
+      commenter:  payload.commenter,
+      date: new Date().toLocaleTimeString(),
+    };
+    const blog = await this.model.findOne({ _id: id });
+    blog.comments.push(comment);
+    return blog.save();
+    // return this.model.findByIdAndUpdate(id, string, { new: true });
   }
 
-  delete = async (payload) =>{
-    // console.log(payload);
-    const valid = await this.model.findOne({_id:payload.id});
+  async delete(payload) {
+    const valid = await this.model.findOne({ _id: payload.id });
     if (valid.blogger == payload.blogger && valid.password == payload.password) {
-     const deleted=  this.model.findByIdAndDelete({_id:payload.id});
-     return deleted;
+      const deleted = this.model.findByIdAndDelete({ _id: payload.id });
+      return deleted;
     }
     return 'invalid username or password';
   }
