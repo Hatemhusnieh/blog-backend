@@ -35,7 +35,8 @@ io.on('connection', socket => {
     const updatedBlog = await blog.comment(payload);
     const data = await blog.read();
     io.in('feeds').emit('blogs', data);
-    // socket.to('feeds').emit('newComment', updatedBlog.blogger);
+    // console.log(payload.commenter,updatedBlog.blogger);
+    io.to('feeds').emit('newComment', {blogger:updatedBlog.blogger,commenter: payload.commenter});
   });
 
   socket.on('delete', async payload => {
@@ -46,6 +47,23 @@ io.on('connection', socket => {
     } else {
       io.to(socket.id).emit('error', errorMessage);
     }
+  });
+  socket.on('like',async (payload)=>{
+    const likedBlog = await blog.like(payload);
+    const data = await blog.read();
+    io.in('feeds').emit('blogs',data);
+    io.to('feeds').emit('newLike',{blogger:likedBlog.blogger,reader:payload.user})
+  });
+  socket.on('updateBlog',async (payload)=>{
+    try{
+
+      const updated = await blog.update(payload);
+      const data = await blog.read();
+      io.in('feeds').emit('blogs',data);
+    }catch(e){
+      console.log(e.message);
+    }
+      
   });
 });
 

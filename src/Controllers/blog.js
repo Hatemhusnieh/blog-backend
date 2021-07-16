@@ -17,15 +17,11 @@ class Interface {
     return blog.save();
   }
 
-  // async update(_id, obj) {
-  //   if (obj.comment) {
-  //     const addComment = this.model.findOne(_id);
-  //     addComment.comments.push(obj);
-  //     addComment.save();
-  //     return;
-  //   }
-  //   return this.model.findByIdAndUpdate(_id, obj, { new: true });
-  // }
+   async update(payload) {
+    const blog= await this.model.findOne({_id:payload.id});
+    blog.content=payload.content;
+    return blog.save();
+  }
 
   async comment(payload) {
     const id = payload.id;
@@ -38,6 +34,11 @@ class Interface {
     blog.comments.push(comment);
     return blog.save();
     // return this.model.findByIdAndUpdate(id, string, { new: true });
+  }
+  async like(payload){
+    const blog = await this.model.findOne({_id:payload.id});
+    blog.likes.push(payload.user);
+    return blog.save();
   }
 
   async delete(payload) {
