@@ -19,8 +19,11 @@ class Interface {
 
    async update(payload) {
     const blog= await this.model.findOne({_id:payload.id});
+    if (blog.blogger == payload.blogger && blog.password == payload.password) {
     blog.content=payload.content;
     return blog.save();
+    }
+    return 'not authorized to update this blog';
   }
 
   async comment(payload) {
@@ -47,7 +50,7 @@ class Interface {
       const deleted = this.model.findByIdAndDelete({ _id: payload.id });
       return deleted;
     }
-    return 'invalid username or password';
+    return 'not authorized to delete this blog';
   }
 }
 
