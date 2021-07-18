@@ -10,7 +10,6 @@ const blog = new Interface(model);
 const io = require('socket.io')(http);
 io.listen(server);
 app.use(cors());
-io.use(cors());
 app.use(express.json());
 
 io.on('connection', socket => {
