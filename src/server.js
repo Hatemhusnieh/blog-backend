@@ -10,6 +10,7 @@ const blog = new Interface(model);
 const io = require('socket.io')(http);
 io.listen(server);
 app.use(cors());
+io.use(cors());
 app.use(express.json());
 
 io.on('connection', socket => {
@@ -52,7 +53,7 @@ io.on('connection', socket => {
     const likedBlog = await blog.like(payload);
     const data = await blog.read();
     io.in('feeds').emit('blogs', data);
-    io.to('feeds').emit('newLike', { blogger: likedBlog.blogger, reader: payload.user })
+    io.to('feeds').emit('newLike', { blogger: likedBlog.blogger, reader: payload.user });
   });
   socket.on('updateBlog', async (payload) => {
 
